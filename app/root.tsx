@@ -1,4 +1,8 @@
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Links,
@@ -13,20 +17,25 @@ import { useTranslation } from "react-i18next";
 import { useChangeLanguage } from "remix-i18next";
 
 import i18nextServer from "~/i18next.server";
+import rootStyles from "~/styles/root.css";
 
 type LoaderData = { locale: string };
 
-export let loader: LoaderFunction = async ({ request }) => {
+export const handle = {
+  // In the handle export, we can add a i18n key with namespaces our route
+  // will need to load. This key can be a single string or an array of strings.
+  // TIP: In most cases, you should set this to your defaultNS from i18n config
+  // or if not, set it to the i18next default namespace "translation"
+  i18n: "common",
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
   let locale = await i18nextServer.getLocale(request);
   return json<LoaderData>({ locale });
 };
 
-export let handle = {
-  // In the handle export, we can add a i18n key with namespaces our route
-  // will need to load. This key can be a single string or an array of strings.
-  // TIP: In most cases, you should set this to your defaultNS from your i18n config
-  // or if you did not set one, set it to the i18next default namespace "translation"
-  i18n: "common",
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: rootStyles }];
 };
 
 export const meta: MetaFunction = () => ({
